@@ -10,6 +10,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.pragati.simplebargraph.AnalyticsApplication;
+import com.example.pragati.simplebargraph.R;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookSdk;
@@ -35,9 +37,14 @@ import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareButton;
 import com.facebook.share.widget.ShareDialog;
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
@@ -45,12 +52,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class LineGraph  extends AppCompatActivity {
 
     JSONArray obj;
     BarChart barChart;
-    ArrayList<String> theDates;
-    ArrayList<BarEntry> barEntries;
+    ArrayList<String> labels;
+    ArrayList<Entry> entries;
     List<Float> cb_data = new ArrayList<Float>();
     List<String> d_date = new ArrayList<String>();
     private Tracker mTracker;
@@ -59,30 +66,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.linegraph);
 
         new HttpAsyncTask().execute("http://pavanifall15apps.esy.es/fitnessApp/all_records.php?user_id=pavaniv");
 
-        ///////////////////////Google Analytics/////////////////////////////
         // Obtain the shared Tracker instance.
         AnalyticsApplication application = (AnalyticsApplication) getApplication();
         mTracker = application.getDefaultTracker();
 
         // Set screen name.
-        mTracker.setScreenName("Calorie Bar Graph ");
+        mTracker.setScreenName("Efficiency Line Graph ");
         mTracker.send(new HitBuilders.ScreenViewBuilder().build());
-
-
-
-
-        }
-
-    public void linegraph(View view){
-        Intent intent = new Intent(this, LineGraph.class);
-        startActivity(intent);
     }
-
-
 
     public static String GET(String url) {
         InputStream inputStream = null;
@@ -128,20 +123,20 @@ public class MainActivity extends AppCompatActivity {
     private class HttpAsyncTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... urls) {
-                    return GET(urls[0]);
+            return GET(urls[0]);
 
         }
 
 
         @Override
         protected void onPostExecute(String result) {
-           parseJsonObject(result);
+            parseJsonObject(result);
         }
 
         public void parseJsonObject(String result) {
 
             String jsonStr = result;
-         //   JSONArray restaurants = null;
+            //   JSONArray restaurants = null;
 
             Log.d("Response: ", "> " + jsonStr);
 
@@ -152,14 +147,14 @@ public class MainActivity extends AppCompatActivity {
                     for (int i = 0; i < person.length(); i++) {
                         JSONObject js = person.getJSONObject(i);
 
-                     // Calorie Burnt
-                       String calorieBurnt = js.getString("activitiescalories");
+                        // Calorie Burnt
+                        String calorieBurnt = js.getString("activitiescalories");
                         float cb = Float.parseFloat(calorieBurnt);
                         //System.out.println("cb float " +cb);
                         //System.out.println("ActivityCalories" +calorieBurnt);
                         cb_data.add(Float.parseFloat(calorieBurnt));
 
-                        String c_date = js.getString("dateTime");
+                        String c_date = js.getString("sleepefficiency");
                         d_date.add(c_date);
                         System.out.println("DateTime" +c_date);
                     }
@@ -172,25 +167,28 @@ public class MainActivity extends AppCompatActivity {
             }
 
 //
-                barEntries = new ArrayList<>();
+            LineChart lineChart = (LineChart) findViewById(R.id.chart);
+            entries = new ArrayList<>();
             for(int i=0; i< cb_data.size(); i++) {
-                barEntries.add(new BarEntry(cb_data.get(i), i));
-                System.out.print("bar enry" +barEntries);
+                entries.add(new BarEntry(cb_data.get(i), i));
+                System.out.print("bar enry" +entries);
 
             }
-            barChart = (BarChart) findViewById(R.id.bargraph);
-            BarDataSet barDataSet = new BarDataSet(barEntries, "Dates");
+            //barChart = (BarChart) findViewById(R.id.bargraph);
+            LineDataSet dataset = new LineDataSet(entries, "Dates");
 
-            theDates = new ArrayList<>();
+            labels = new ArrayList<String>();
             for (int i=0; i< d_date.size(); i++) {
-                theDates.add(d_date.get(i));
+                labels.add(d_date.get(i));
             }
 
-            BarData theData = new BarData(theDates, barDataSet);
-            barChart.setData(theData);
-            barChart.setEnabled(true);
-            barChart.setDragEnabled(true);
-            barChart.setScaleEnabled(true);
+            LineData data = new LineData(labels, dataset);
+            dataset.setColors(ColorTemplate.COLORFUL_COLORS);
+            dataset.setDrawCubic(true);
+            dataset.setDrawFilled(true);
+
+            lineChart.setData(data);
+            lineChart.animateY(5000);
         }
     }
 }

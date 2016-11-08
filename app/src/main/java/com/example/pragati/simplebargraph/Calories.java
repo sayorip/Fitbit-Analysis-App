@@ -1,39 +1,10 @@
 package com.example.pragati.simplebargraph;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.MenuItem;
-import android.view.View;
 
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookSdk;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-
-import com.facebook.appevents.AppEventsLogger;
-import com.facebook.share.Sharer;
-import com.facebook.share.model.ShareLinkContent;
-import com.facebook.share.widget.ShareButton;
-import com.facebook.share.widget.ShareDialog;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
@@ -41,27 +12,39 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class Calories extends AppCompatActivity {
 
     JSONArray obj;
     BarChart barChart;
+//    private static final String cal_URL = Values.web_url + "http://pavanifall15apps.esy.es/fitnessApp/all_records.php";
     ArrayList<String> theDates;
     ArrayList<BarEntry> barEntries;
     List<Float> cb_data = new ArrayList<Float>();
     List<String> d_date = new ArrayList<String>();
     private Tracker mTracker;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_calories);
 
-        new HttpAsyncTask().execute("http://pavanifall15apps.esy.es/fitnessApp/all_records.php?user_id=pavaniv");
+        String query = "http://pavanifall15apps.esy.es/fitnessApp/all_records.php?user_id=" + Values.username;
+        new HttpAsyncTask().execute(query);
 
         ///////////////////////Google Analytics/////////////////////////////
         // Obtain the shared Tracker instance.
@@ -69,20 +52,10 @@ public class MainActivity extends AppCompatActivity {
         mTracker = application.getDefaultTracker();
 
         // Set screen name.
-        mTracker.setScreenName("Calorie Bar Graph ");
+        mTracker.setScreenName("Calorie Bar Graph");
         mTracker.send(new HitBuilders.ScreenViewBuilder().build());
 
-
-
-
-        }
-
-    public void linegraph(View view){
-        Intent intent = new Intent(this, LineGraph.class);
-        startActivity(intent);
     }
-
-
 
     public static String GET(String url) {
         InputStream inputStream = null;
@@ -126,22 +99,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class HttpAsyncTask extends AsyncTask<String, Void, String> {
+
+       // ProgressDialog loading;
+
+
         @Override
         protected String doInBackground(String... urls) {
-                    return GET(urls[0]);
+            return GET(urls[0]);
 
         }
 
 
         @Override
         protected void onPostExecute(String result) {
-           parseJsonObject(result);
+            parseJsonObject(result);
         }
 
         public void parseJsonObject(String result) {
 
             String jsonStr = result;
-         //   JSONArray restaurants = null;
+            //   JSONArray restaurants = null;
 
             Log.d("Response: ", "> " + jsonStr);
 
@@ -152,11 +129,11 @@ public class MainActivity extends AppCompatActivity {
                     for (int i = 0; i < person.length(); i++) {
                         JSONObject js = person.getJSONObject(i);
 
-                     // Calorie Burnt
-                       String calorieBurnt = js.getString("activitiescalories");
+                        // Calorie Burnt
+                        String calorieBurnt = js.getString("activitiescalories");
                         float cb = Float.parseFloat(calorieBurnt);
-                        //System.out.println("cb float " +cb);
-                        //System.out.println("ActivityCalories" +calorieBurnt);
+                        System.out.println("cb float " +cb);
+                        System.out.println("ActivityCalories" +calorieBurnt);
                         cb_data.add(Float.parseFloat(calorieBurnt));
 
                         String c_date = js.getString("dateTime");
@@ -172,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
 //
-                barEntries = new ArrayList<>();
+            barEntries = new ArrayList<>();
             for(int i=0; i< cb_data.size(); i++) {
                 barEntries.add(new BarEntry(cb_data.get(i), i));
                 System.out.print("bar enry" +barEntries);
@@ -187,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             BarData theData = new BarData(theDates, barDataSet);
+            barChart.setDescription("Calories burnt");
             barChart.setData(theData);
             barChart.setEnabled(true);
             barChart.setDragEnabled(true);

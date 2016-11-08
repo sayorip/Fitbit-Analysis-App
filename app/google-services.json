@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "696344216471",
+    "project_id": "fitness-app-601cd"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:696344216471:android:3d2b5129120074ef",
+        "android_client_info": {
+          "package_name": "com.example.pragati.simplebargraph"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLka1Gze84V6CZaQXU3Vyb-Z2y2EPZNk8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-85269086-4"
+          }
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

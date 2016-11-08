@@ -25,11 +25,14 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:23.0.1'
-    compile 'com.github.PhilJay:MPAndroidChart:v2.1.6'
+//    compile 'com.github.PhilJay:MPAndroidChart:v2.1.6'
+    compile 'com.github.PhilJay:MPAndroidChart:v2.2.4'
     compile 'org.apache.httpcomponents:httpcore:4.4.1'
     compile 'org.apache.httpcomponents:httpclient:4.5'
     compile 'org.apache.httpcomponents:httpclient:4.5'
     compile group: 'cz.msebera.android', name: 'httpclient', version: '4.4.1.1'
+    compile 'com.google.android.gms:play-services-analytics:9.2.0'
+    compile 'com.facebook.android:facebook-android-sdk:[4,5)'
     android {
         useLibrary 'org.apache.http.legacy'
     }
@@ -39,4 +42,6 @@ dependencies {
 repositories {
 
     maven { url 'https://jitpack.io' }
+    mavenCentral()
 }
+apply plugin: 'com.google.gms.google-services'
